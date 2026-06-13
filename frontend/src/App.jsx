@@ -1,34 +1,28 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./Login";
+import Register from "./Register";
+import Dashboard from "./Dashboard";
 
 function App() {
-  const [users, setUsers] = useState([]);
+  const [token, setToken] = useState(localStorage.getItem('token') || '');
 
   useEffect(() => {
-    // We use import.meta.env.VITE_API_URL for production
-    // If it's not set (like in local development), we fall back to localhost
-    const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
-    
-    axios
-      .get(`${apiUrl}/users`)
-      .then((res) => {
-        setUsers(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+    if (token) {
+      localStorage.setItem('token', token);
+    } else {
+      localStorage.removeItem('token');
+    }
+  }, [token]);
 
   return (
-    <div>
-      <h1>Users List</h1>
-
-      {users.map((user) => (
-        <div key={user.id}>
-          <h3>{user.name}</h3>
-        </div>
-      ))}
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/login" element={token ? <Navigate to="/" /> : <Login setToken={setToken} />} />
+        <Route path="/register" element={token ? <Navigate to="/" /> : <Register />} />
+        <Route path="/" element={token ? <Dashboard token={token} setToken={setToken} /> : <Navigate to="/login" />} />
+      </Routes>
+    </Router>
   );
 }
 
