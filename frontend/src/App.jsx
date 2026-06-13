@@ -5,8 +5,12 @@ function App() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
+    // We use import.meta.env.VITE_API_URL for production
+    // If it's not set (like in local development), we fall back to localhost
+    const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+    
     axios
-      .get("http://127.0.0.1:8000/users")
+      .get(`${apiUrl}/users`)
       .then((res) => {
         setUsers(res.data);
       })
